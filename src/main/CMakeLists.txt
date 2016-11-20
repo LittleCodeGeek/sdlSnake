@@ -13,3 +13,8 @@ target_link_libraries(sdlSnake SDL SDLmain ${base_libs})
 add_dependencies(sdlSnake extSDL)
 set_property(TARGET sdlSnake PROPERTY CXX_STANDARD 14)
 set_property(TARGET sdlSnake PROPERTY CXX_STANDARD_REQUIRED ON)
+
+install(
+    TARGETS sdlSnake
+    RUNTIME DESTINATION "${CMAKE_SOURCE_DIR}/bin"
+)

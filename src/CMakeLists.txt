@@ -21,11 +21,11 @@ if(MSVC)
 endif(MSVC)
 endmacro(ADD_PRECOMPILED_HEADER)
 
-ExternalProject_Add(
-    extSDL
+ExternalProject_Add(extSDL
+    DEPENDS sdl_submodule
     PREFIX "extra"
-    GIT_REPOSITORY "https://github.com/SDL-mirror/SDL.git"
-    GIT_TAG "release-2.0.5"
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/SDL"
+    DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 )

@@ -11,7 +11,7 @@ mkdir %curdir%\build
 cd %curdir%\build
 
 :CALLCMAKE
-cmake -G %generator% ..\src -DCMAKE_GENERATOR_PLATFORM=x64
+cmake -G %generator% -DCMAKE_GENERATOR_PLATFORM=x64 ..
 IF %ERRORLEVEL% NEQ 0 GOTO CMAKEERROR
 
 :STARTVS
