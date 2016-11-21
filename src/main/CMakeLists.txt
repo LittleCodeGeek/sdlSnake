@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.4)
 
-project(sdlSnake)
-
 include_directories(${SDL_INCLUDE_DIRS})
 
 set(SOURCES
     main.cpp
+    snakegame.cpp
 )
 
 add_executable(sdlSnake ${SOURCES})

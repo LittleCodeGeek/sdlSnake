@@ -3,9 +3,11 @@
 #include <windows.h>
 #endif
 
-#include <cstdio>
+#include "snakegame.h"
 
 #include <SDL.h>
+
+#include <cstdio>
 
 static constexpr int SCREEN_WIDTH = 800;
 static constexpr int SCREEN_HEIGHT = 600;
@@ -13,10 +15,10 @@ static constexpr int SCREEN_HEIGHT = 600;
 int main(int argc, char *argv[])
 {
     //The window we'll be rendering to
-    SDL_Window* window = NULL;
+    SDL_Window *window = NULL;
 
     //The surface contained by the window
-    SDL_Surface* screenSurface = NULL;
+    SDL_Surface *screenSurface = NULL;
 
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -42,8 +44,9 @@ int main(int argc, char *argv[])
             //Update the surface
             SDL_UpdateWindowSurface(window);
 
-            //Wait two seconds
-            SDL_Delay(2000);
+            SnakeGame game;
+
+            game.run();
         }
     }
 

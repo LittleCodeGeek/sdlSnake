@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4)
-
+project(sdlSnake)
 find_package(Git)
 
 add_custom_target(submodule_init
