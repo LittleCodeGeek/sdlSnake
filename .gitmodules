@@ -1,3 +1,0 @@
-[submodule "extra/SDL"]
-	path = extra/SDL
-	url = https://github.com/SDL-mirror/SDL.git

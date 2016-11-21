@@ -15,7 +15,7 @@ cmake -G %generator% -DCMAKE_GENERATOR_PLATFORM=x64 ..
 IF %ERRORLEVEL% NEQ 0 GOTO CMAKEERROR
 
 :STARTVS
-start project.sln
+start sdlSnake.sln
 GOTO END
 
 :CMAKEERROR
@@ -23,3 +23,4 @@ echo "There was an error running CMake"
 pause
 
 :END
+cd %curdir%
