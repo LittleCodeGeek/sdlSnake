@@ -13,5 +13,6 @@ set_property(TARGET sdlSnake PROPERTY CXX_STANDARD_REQUIRED ON)
 
 install(
     TARGETS sdlSnake
+    COMPONENT "Runtime"
     RUNTIME DESTINATION "${CMAKE_SOURCE_DIR}/bin"
 )
