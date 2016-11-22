@@ -5,6 +5,4 @@ fi
 
 cd build
 
-cmake ..
-cmake --build .
-cmake --build . --target install
+cmake .. && cmake --build . --target install

@@ -21,56 +21,50 @@ if(MSVC)
 endif(MSVC)
 endmacro(ADD_PRECOMPILED_HEADER)
 
-ExternalProject_Add(extSDL
-    DEPENDS sdl_submodule
-    PREFIX "extra"
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/SDL"
-    DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ""
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DSDL_SHARED:bool=OFF
-)
-ExternalProject_Get_Property(extSDL install_dir)
-set(SDL_INSTALL_DIR "${install_dir}")
-ExternalProject_Get_Property(extSDL source_dir)
-set(SDL_INCLUDE_DIR "${install_dir}/include/SDL2")
-set(SDL_LIB ${SDL_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX})
-set(SDL_MAIN_LIB ${SDL_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${CMAKE_STATIC_LIBRARY_SUFFIX})
-
 add_library(SDL STATIC IMPORTED)
-set_target_properties(SDL PROPERTIES IMPORTED_LOCATION ${SDL_LIB})
 add_library(SDLmain STATIC IMPORTED)
-set_target_properties(SDLmain PROPERTIES IMPORTED_LOCATION ${SDL_MAIN_LIB})
-
-ExternalProject_Add(extSDL_image
-    DEPENDS extSDL sdl_image_submodule
-    PREFIX "extra"
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/extra/SDL_image"
-    DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --disable-sdltest --enable-shared=no
-)
-ExternalProject_Get_Property(extSDL_image install_dir)
-set(SDL_IMAGE_INSTALL_DIR "${install_dir}")
-set(SDL_IMAGE_INCLUDE_DIR "${install_dir}/include/SDL2")
-set(SDL_IMAGE_LIB ${SDL_IMAGE_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_image${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-add_library(SDL_Image STATIC IMPORTED)
-set_target_properties(SDL_Image PROPERTIES IMPORTED_LOCATION ${SDL_IMAGE_LIB})
+add_library(SDL_image STATIC IMPORTED)
 
 if (WIN32)
-    set(base_libs ${base_libs} winmm.lib Imm32.lib version.lib)
-endif()
+    set(base_libs winmm.lib Imm32.lib version.lib)
+else()
+    if (UNIX AND APPLE)
+        find_program(BREW brew)
+        if (NOT BREW)
+            message(FATAL_ERROR "Brew was not found, cannot proceed on Mac OS without brew")
+        endif()
 
-if (UNIX AND APPLE)
-    find_library(COCOA_LIBRARY cocoa)
-    find_library(CARBON_LIBRARY carbon)
-    find_library(COREAUDIO_LIBRARY coreaudio)
-    find_library(AUDIOTOOLBOX_LIBRARY audiotoolbox)
-    find_library(FORCEFEEDBACK_LIBRARY forcefeedback)
-    find_library(COREVIDEO_LIBRARY corevideo)
-    find_library(IOKIT_LIBRARY iokit)
-    find_library(ICONV_LIBRARY iconv)
-    set(base_libs ${base_libs} ${COCOA_LIBRARY} ${CARBON_LIBRARY} ${COREAUDIO_LIBRARY} ${AUDIOTOOLBOX_LIBRARY} ${FORCEFEEDBACK_LIBRARY} ${COREVIDEO_LIBRARY} ${IOKIT_LIBRARY} ${ICONV_LIBRARY})
+        if (NOT DEFINED ${NEED_INSTALL_SDL} OR ${NEED_INSTALL_SDL})
+            execute_process(
+                COMMAND sh -c "if ! ${BREW} ls --versions sdl2 >/dev/null; then ${BREW} install sdl2; fi;"
+            )
+            execute_process(
+                COMMAND sh -c "if ! ${BREW} ls --version sdl2_image >/dev/null; then ${BREW} install sdl2_image; fi;"
+            )
+            set(NEED_INSTALL_SDL OFF CACHE BOOL "Do we need to install SDL with a package manager")
+        endif()
+    endif()
+
+    INCLUDE(FindPkgConfig)
+
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2>=2.0.5)
+    PKG_SEARCH_MODULE(SDL2IMAGE REQUIRED SDL2_image>=2.0.1)
+
+    set_target_properties(SDL PROPERTIES IMPORTED_LOCATION
+        ${SDL2_STATIC_LIBRARY_DIRS}/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX}
+    )
+    set_target_properties(SDL PROPERTIES INTERFACE_LINK_LIBRARIES
+         "${SDL2_STATIC_LDFLAGS}"
+    )
+    set_target_properties(SDL PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+        ${SDL2_INCLUDE_DIRS}
+    )
+    set_target_properties(SDLmain PROPERTIES IMPORTED_LOCATION
+        ${SDL2_STATIC_LIBRARY_DIRS}/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${CMAKE_STATIC_LIBRARY_SUFFIX}
+    )
+    set_target_properties(SDL_image PROPERTIES IMPORTED_LOCATION
+        ${SDL2IMAGE_STATIC_LIBRARY_DIRS}/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_image${CMAKE_STATIC_LIBRARY_SUFFIX}
+    )
 endif()
 
 add_subdirectory(main)
